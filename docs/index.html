@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Docker Image Monitor — Live Sandbox Demo</title>
+    <link rel="stylesheet" href="demo.css">
+</head>
+<body>
+    <div class="container">
+        <div class="sandbox-banner" role="status">
+            <span>🧪 <strong>Live Sandbox Mode:</strong> Simulated homelab data &amp; Docker Engine SSE streams. No real containers are modified.</span>
+            <button type="button" id="reset-demo-btn" class="btn-reset-demo" onclick="resetDemoSandbox()" title="Restore initial sample containers">↺ Reset Demo</button>
+        </div>
+
+        <header>
+            <div class="title-block">
+                <h1>🐳 Running Containers — Image Monitor</h1>
+                <div class="last-scan">Last check: <strong id="last-scan-time">2026-11-25 19:30:00</strong> · Schedule: <code>Every 6h</code> (4 workers)</div>
+            </div>
+            <div class="stats">
+                <div class="stat-box"><span class="stat-num" id="stat-running">0</span><span class="stat-lbl">Running</span></div>
+                <div class="stat-box"><span class="stat-num" id="stat-updates" style="color:#fbbf24">0</span><span class="stat-lbl">Updates</span></div>
+                <div class="stat-box"><span class="stat-num" id="stat-errors" style="color:#f87171">0</span><span class="stat-lbl">Errors</span></div>
+            </div>
+            <div class="header-btns">
+                <button type="button" id="scan-btn" class="btn-scan" onclick="runLiveScan()"></button>
+                <button type="button" id="refresh-btn" class="btn-refresh" onclick="simulateRefresh()">↻ Refresh</button>
+                <button type="button" id="dh-open-btn" class="btn-refresh" onclick="document.getElementById('dh-modal').showModal()"></button>
+            </div>
+        </header>
+
+        <div id="toast-stack">
+            <div id="progress-wrapper" class="card" style="padding-left:18px;padding-right:18px;">
+                <div class="progress-header">
+                    <span id="progress-label">Connecting to Docker Engine...</span>
+                    <span id="progress-pct">0%</span>
+                </div>
+                <div class="progress-track">
+                    <div id="progress-fill" class="progress-fill"></div>
+                </div>
+            </div>
+        </div>
+
+        <section id="updates-section">
+            <h2>
+                <span class="h2-title" id="updates-title">🟡 Available Updates (0)</span>
+                <button type="button" id="pull-recreate-all-btn" class="btn-pull-all hiding" onclick="pullAndRecreateAll()"></button>
+            </h2>
+            <div id="updates-list"></div>
+        </section>
+
+        <section id="errors-section">
+            <h2 id="errors-title">🔴 Registry Check Errors (0)</h2>
+            <div id="errors-list"></div>
+        </section>
+
+        <section id="watched-section">
+            <h2 id="watched-title">🟢 Up-to-Date Containers (0)</h2>
+            <div id="watched-list"></div>
+        </section>
+
+        <section id="excluded-section">
+            <h2 id="excluded-title">🔵 Excluded Containers (0)</h2>
+            <div id="excluded-list"></div>
+        </section>
+    </div>
+
+    <dialog id="dh-modal">
+        <h3>Docker Hub Authentication</h3>
+        <p class="modal-desc">
+            Increase pull &amp; check rate limits. In this sandbox, any non-empty credentials will simulate token verification.
+            <a href="https://app.docker.com/settings/personal-access-tokens/create" target="_blank" rel="noopener">Generate a Read-Only token ↗</a>
+        </p>
+        <form id="dh-form" onsubmit="handleDemoDockerHub(event)">
+            <input type="text" id="dh-username" name="username" placeholder="Docker Hub Username" value="homelab_demo">
+            <input type="password" id="dh-token" name="token" placeholder="Personal Access Token (dckr_pat_...)" value="dckr_pat_sandbox_demo_token">
+            <div class="modal-actions">
+                <button type="button" id="dh-clear-btn" class="btn-modal-danger" onclick="clearDemoDockerHub()">Disconnect</button>
+                <button type="button" class="btn-modal-cancel" onclick="document.getElementById('dh-modal').close()">Cancel</button>
+                <button type="submit" class="btn-modal-save">Save &amp; Verify</button>
+            </div>
+        </form>
+    </dialog>
+
+    <script src="demo-mocks.js"></script>
+</body>
+</html>
